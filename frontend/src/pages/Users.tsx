@@ -273,7 +273,7 @@ export function Users() {
                       <Switch
                         checked={user.isActive}
                         onCheckedChange={() => toggleUserStatus(user.id)}
-                        size="sm"
+
                       />
                       {user.isActive ? (
                         <UserCheck className="w-4 h-4 text-green-600" />
