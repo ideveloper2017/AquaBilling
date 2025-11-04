@@ -7,6 +7,7 @@ import uz.aquabill.app.v1.customer.model.Customer
 import uz.aquabill.app.v1.customer.repository.CustomerRepository
 import uz.aquabill.app.v1.customer.service.CustomerService
 import jakarta.persistence.EntityNotFoundException
+import uz.aquabill.app.v1.zone.model.Zone
 
 @Service
 class CustomerServiceImpl(
@@ -75,4 +76,19 @@ class CustomerServiceImpl(
         return customerRepository.search(query)
             .map { customerMapper.toDto(it) }
     }
+
+    override fun getAll(): List<Customer> = customerRepository.findAll()
+
+    override fun getById(id: Long): Customer =
+        customerRepository.findById(id).orElseThrow { NoSuchElementException("Customer not found") }
+
+    override fun findByAccountNumber(accountNumber: String): Customer? =
+        customerRepository.findByAccountNumber(accountNumber)
+
+    override fun getByZone(zone: Zone): List<Customer> =
+        customerRepository.findAllByZone(zone)
+
+    override fun save(customer: Customer): Customer = customerRepository.save(customer)
+
+    override fun delete(id: Long) = customerRepository.deleteById(id)
 }

@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import uz.aquabill.app.v1.customer.model.Customer
+import uz.aquabill.app.v1.zone.model.Zone
 
 @Repository
 interface CustomerRepository : JpaRepository<Customer, Long> {
@@ -17,5 +18,7 @@ interface CustomerRepository : JpaRepository<Customer, Long> {
              OR c.phone LIKE CONCAT('%', :query, '%'))
     """)
     fun search(query: String): List<Customer>
+    fun findByAccountNumber(accountNumber: String): Customer?
+    fun findAllByZone(zone: Zone): List<Customer>
 }
 
