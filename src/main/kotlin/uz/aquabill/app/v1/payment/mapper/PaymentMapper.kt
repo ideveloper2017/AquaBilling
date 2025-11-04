@@ -1,7 +1,7 @@
 package uz.aquabill.app.v1.payment.mapper
 
 import org.springframework.stereotype.Component
-import uz.aquabill.app.v1.order.model.Order
+
 import uz.aquabill.app.v1.payment.dto.*
 import uz.aquabill.app.v1.payment.model.Payment
 import uz.aquabill.app.v1.payment.model.PaymentStatus

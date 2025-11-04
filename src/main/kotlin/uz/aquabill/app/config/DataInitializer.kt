@@ -15,8 +15,7 @@ import uz.aquabill.app.v1.settings.model.Settings
 import uz.aquabill.app.v1.settings.repository.SettingsRepository
 import uz.aquabill.app.v1.customer.model.Customer
 import uz.aquabill.app.v1.customer.repository.CustomerRepository
-import uz.aquabill.app.v1.units.model.Units
-import uz.aquabill.app.v1.units.repository.UnitRepository
+
 
 @Configuration
 class DataInitializer(
@@ -26,71 +25,69 @@ class DataInitializer(
     private val passwordEncoder: PasswordEncoder,
     private val settingsRepository: SettingsRepository,
     private val customerRepository: CustomerRepository,
-    private val unitsRepository: UnitRepository
-
 ) {
 
     @Bean
     @Profile("!test")
     fun initData(): CommandLineRunner {
         return CommandLineRunner {
-            val defaultUnits = listOf(
-                Units().apply {
-                    code = "шт."
-                    name = "Dona"
-                    active = true
-                },
-                Units().apply {
-                    code = "kg"
-                    name = "Kilogramm"
-                    active = true
-                },
-                Units().apply {
-                    code = "g"
-                    name = "Gramm"
-                    active = true
-                },
-                Units().apply {
-                    code = "l"
-                    name = "Litr"
-                    active = true
-                },
-                Units().apply {
-                    code = "m"
-                    name = "Metr"
-                    active = true
-                },
-                Units().apply {
-                    code = "m²"
-                    name = "Kvadrat metr"
-                    active = true
-                },
-                Units().apply {
-                    code = "m³"
-                    name = "Kub metr"
-                    active = true
-                },
-                Units().apply {
-                    code = "quti"
-                    name = "Quti"
-                    active = true
-                },
-                Units().apply {
-                    code = "set"
-                    name = "To'plam"
-                    active = true
-                },
-                Units().apply {
-                    code = "pair"
-                    name = "Juft"
-                    active = true
-                }
-            )
-            defaultUnits.forEach { unit ->
-                if (!unitsRepository.existsByCode(unit.code!!)) {
-                    unitsRepository.save(unit)
-                }
-            }
+//            val defaultUnits = listOf(
+//                Units().apply {
+//                    code = "шт."
+//                    name = "Dona"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "kg"
+//                    name = "Kilogramm"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "g"
+//                    name = "Gramm"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "l"
+//                    name = "Litr"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "m"
+//                    name = "Metr"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "m²"
+//                    name = "Kvadrat metr"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "m³"
+//                    name = "Kub metr"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "quti"
+//                    name = "Quti"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "set"
+//                    name = "To'plam"
+//                    active = true
+//                },
+//                Units().apply {
+//                    code = "pair"
+//                    name = "Juft"
+//                    active = true
+//                }
+//            )
+//            defaultUnits.forEach { unit ->
+//                if (!unitsRepository.existsByCode(unit.code!!)) {
+//                    unitsRepository.save(unit)
+//                }
+//            }
 
 //            [{"id":"8d372046-7782-450d-bc7a-9e8031ef2c8a","label":"manager","value":"manager"},{"id":"4ee47946-9f6e-4f39-806b-3a9459bbd83d","label":"hostess","value":"hostess"},{"id":"c253171c-9311-4804-8117-cdc83df217c3","label":"casher","value":"casher"},{"id":"f66a180d-dd05-4fb8-9672-409a168cf4a4","label":"bookkeeper","value":"bookkeeper"},{"id":"a75d622d-58f2-4a40-bebd-fed761e81cc2","label":"waiter","value":"waiter"},{"id":"623ae99d-0cfe-4305-8cde-e452edd416aa","label":"barman","value":"barman"},{"id":"464bf248-b147-417b-8f7e-5eee0af6cffd","label":"cook","value":"cook"},{"id":"72c0227f-df0b-46a9-9c3c-2abb0fe51596","label":"runner","value":"runner"}]
 //            Менеджер
