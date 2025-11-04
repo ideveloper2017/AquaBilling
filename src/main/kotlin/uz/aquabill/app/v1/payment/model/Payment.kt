@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id")
-    lateinit var invoillce: Invoice
+    lateinit var invoice: Invoice
 
     var paymentDate: Instant = Instant.now()
     @Column(nullable = false, precision = 10, scale = 2)
