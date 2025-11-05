@@ -6,15 +6,15 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class PaymentDto(
-    val id: Long,
-    val orderId: Long,
+    val id: Long?,
+    val invoiceId: Long,
     val amount: BigDecimal,
     val paymentMethod: PaymentMethod,
     val status: PaymentStatus,
     val transactionId: String?,
     val notes: String?,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val createdAt: LocalDateTime?,
+    val updatedAt: LocalDateTime?
 )
 
 data class CreatePaymentRequest(

@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.io.Serializable
 import java.time.Instant
+import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
@@ -20,8 +21,8 @@ abstract class DateAudit : Serializable {
 
     @CreationTimestamp
     @Column(updatable = false)
-    var createdAt: Instant? = null
+    var createdAt: LocalDateTime? = null
 
     @UpdateTimestamp
-    var updatedAt: Instant? = null
+    var updatedAt: LocalDateTime? = null
 }

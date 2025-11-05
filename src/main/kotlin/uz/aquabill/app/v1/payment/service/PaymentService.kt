@@ -7,13 +7,11 @@ import org.springframework.transaction.annotation.Transactional
 import uz.aquabill.app.v1.invoice.model.Invoice
 import uz.aquabill.app.v1.invoice.model.InvoiceStatus
 import uz.aquabill.app.v1.invoice.repository.InvoiceRepository
-import uz.aquabill.app.v1.order.service.OrderService
 import uz.aquabill.app.v1.payment.dto.*
 import uz.aquabill.app.v1.payment.exception.PaymentNotFoundException
 import uz.aquabill.app.v1.payment.mapper.PaymentMapper
 import uz.aquabill.app.v1.payment.model.Payment
 import uz.aquabill.app.v1.payment.model.PaymentMethod
-import uz.aquabill.app.v1.order.model.PaymentStatus as OrderPaymentStatus
 import uz.aquabill.app.v1.payment.model.PaymentStatus
 import uz.aquabill.app.v1.payment.repository.PaymentRepository
 import uz.aquabill.app.v1.user.model.User
@@ -30,7 +28,7 @@ class PaymentService(
 
     @Transactional(readOnly = true)
     fun getPaymentById(id: Long): PaymentDto {
-        val payment = paymentRepository.findByIdAndIsDeletedFalse(id)
+        val payment = paymentRepository.findByIdAndDeletedFalse(id)
             ?: throw PaymentNotFoundException("Payment with id $id not found")
         return paymentMapper.toDto(payment)
     }
@@ -40,11 +38,11 @@ class PaymentService(
             .orElseThrow { NoSuchElementException("Invoice not found") }
 
         val payment = Payment().apply {
-            invoice = invoice
-            amount = amount
-            paymentMethod = method
-            paymentDate = Instant.now()
-            status = PaymentStatus.CONFIRMED
+            this.invoice = invoice
+            this.amount = amount
+            this.paymentMethod = method
+            this.paymentDate = Instant.now()
+            this.status = PaymentStatus.CONFIRMED
         }
 
         val saved = paymentRepository.save(payment)
@@ -110,8 +108,34 @@ class PaymentService(
 //    }
 
     @Transactional
+    fun recordPayment(invoiceId: Long, amount: BigDecimal, method: PaymentMethod): Payment {
+        val invoice = invoiceRepository.findById(invoiceId)
+            .orElseThrow { IllegalArgumentException("Invoice not found") }
+
+        val payment = paymentRepository.save(
+            Payment().apply {
+                this.invoice = invoice
+                this.paymentDate = Instant.now()
+                this.amount = amount
+                this.paymentMethod = method
+                this.status = PaymentStatus.CONFIRMED
+            }
+        )
+
+        val totalPaid = paymentRepository.findAllByInvoiceId(invoiceId).sumOf { it.amount }
+        val status = when {
+            totalPaid >= invoice.totalAmount -> InvoiceStatus.PAID
+            totalPaid > BigDecimal.ZERO -> InvoiceStatus.PARTIAL
+            else -> InvoiceStatus.ISSUED
+        }
+
+        invoiceRepository.save(invoice.copy(status = status))
+        return payment
+    }
+
+    @Transactional
     fun updatePayment(id: Long, request: UpdatePaymentRequest): PaymentDto {
-        val payment = paymentRepository.findByIdAndIsDeletedFalse(id)
+        val payment = paymentRepository.findByIdAndDeletedFalse(id)
             ?: throw PaymentNotFoundException("Payment with id $id not found")
             
         request.amount?.let { payment.amount = it }
@@ -126,10 +150,10 @@ class PaymentService(
 
     @Transactional
     fun deletePayment(id: Long) {
-        val payment = paymentRepository.findByIdAndIsDeletedFalse(id)
+        val payment = paymentRepository.findByIdAndDeletedFalse(id)
             ?: throw PaymentNotFoundException("Payment with id $id not found")
             
-        payment.isDeleted = true
+        payment.deleted = true
         paymentRepository.save(payment)
     }
     

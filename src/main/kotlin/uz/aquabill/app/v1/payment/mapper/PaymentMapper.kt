@@ -1,6 +1,7 @@
 package uz.aquabill.app.v1.payment.mapper
 
 import org.springframework.stereotype.Component
+import uz.aquabill.app.v1.invoice.model.Invoice
 
 import uz.aquabill.app.v1.payment.dto.*
 import uz.aquabill.app.v1.payment.model.Payment
@@ -13,7 +14,7 @@ class PaymentMapper {
     fun toDto(payment: Payment): PaymentDto {
         return PaymentDto(
             id = payment.id,
-            orderId = payment.order.id.let { it ?: throw IllegalArgumentException("Order ID cannot be null") },
+            invoiceId = payment.invoice.id.let { it ?: throw IllegalArgumentException("Order ID cannot be null") },
             amount = payment.amount,
             paymentMethod = payment.paymentMethod,
             status = payment.status,
@@ -26,18 +27,18 @@ class PaymentMapper {
     
     fun toEntity(
         request: CreatePaymentRequest,
-        order: Order,
+        invoice: Invoice,
         createdBy: User? = null
     ): Payment {
-        return Payment(
-            order = order,
-            amount = request.amount,
-            paymentMethod = request.paymentMethod,
-            status = PaymentStatus.PENDING,
-            notes = request.notes,
-            transactionId = request.transactionId,
-            createdBy = createdBy
-        )
+        return Payment().apply {
+            this.invoice = invoice
+            this.amount = request.amount
+            this.paymentMethod = request.paymentMethod
+            this.status = PaymentStatus.PENDING
+            this.notes = request.notes
+            this.transactionId = request.transactionId
+            this.createdBy = createdBy
+        }
     }
     
     fun updateFromRequest(

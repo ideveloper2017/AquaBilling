@@ -65,30 +65,30 @@ class PaymentController(
         return ResponseEntity.ok(ApiResponse.success(payments))
     }
 
-    @GetMapping("/order/{orderId}")
-    @Operation(
-        summary = "Get payments by order ID",
-        description = "Retrieves all payments for a specific order"
-    )
-    fun getPaymentsByOrderId(
-        @Parameter(description = "Order ID") @PathVariable orderId: Long
-    ): ResponseEntity<ApiResponse<List<PaymentDto>>> {
-        val payments = paymentService.getPaymentsByOrderId(orderId)
-        return ResponseEntity.ok(ApiResponse.success(payments))
-    }
+//    @GetMapping("/order/{orderId}")
+//    @Operation(
+//        summary = "Get payments by order ID",
+//        description = "Retrieves all payments for a specific order"
+//    )
+//    fun getPaymentsByOrderId(
+//        @Parameter(description = "Order ID") @PathVariable orderId: Long
+//    ): ResponseEntity<ApiResponse<List<PaymentDto>>> {
+//        val payments = paymentService.getPaymentsByOrderId(orderId)
+//        return ResponseEntity.ok(ApiResponse.success(payments))
+//    }
 
-    @PostMapping
-    @Operation(
-        summary = "Create a new payment",
-        description = "Creates a new payment for an order"
-    )
-    fun createPayment(
-        @RequestBody request: CreatePaymentRequest,
-        @AuthenticationPrincipal user: User
-    ): ResponseEntity<ApiResponse<PaymentDto>?> {
-        val payment = paymentService.createPayment(request, user)
-        return ResponseEntity.ok(ApiResponse.success( "Payment created successfully",payment))
-    }
+//    @PostMapping
+//    @Operation(
+//        summary = "Create a new payment",
+//        description = "Creates a new payment for an order"
+//    )
+//    fun createPayment(
+//        @RequestBody request: CreatePaymentRequest,
+//        @AuthenticationPrincipal user: User
+//    ): ResponseEntity<ApiResponse<PaymentDto>?> {
+//        val payment = paymentService.createPayment(request, user)
+//        return ResponseEntity.ok(ApiResponse.success( "Payment created successfully",payment))
+//    }
 
     @PutMapping("/{id}")
     @Operation(

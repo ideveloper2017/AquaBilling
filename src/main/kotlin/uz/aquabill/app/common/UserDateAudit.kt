@@ -1,9 +1,13 @@
 package uz.aquabill.app.common
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import jakarta.persistence.FetchType
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.MappedSuperclass
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.LastModifiedBy
+import uz.aquabill.app.v1.user.model.User
 
 @MappedSuperclass
 @JsonIgnoreProperties(
@@ -13,8 +17,9 @@ import org.springframework.data.annotation.LastModifiedBy
 abstract class UserDateAudit : DateAudit() {
 
     @CreatedBy
-    var createdBy: Long? = null
-        protected set
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", updatable = false)
+    var createdBy: User? = null
 
     @LastModifiedBy
     var updatedBy: Long? = null

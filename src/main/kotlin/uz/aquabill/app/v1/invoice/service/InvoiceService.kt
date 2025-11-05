@@ -6,12 +6,10 @@ import uz.aquabill.app.v1.invoice.model.Invoice
 import uz.aquabill.app.v1.invoice.repository.InvoiceRepository
 import uz.aquabill.app.v1.meterreading.repository.MeterReadingRepository
 import uz.aquabill.app.v1.tarrif.model.Tariff
-import uz.aquabill.app.v1.tarrif.model.TariffType
 import uz.aquabill.app.v1.tarrif.repository.TariffRepository
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.collections.firstOrNull
-import kotlin.collections.sortedBy
 
 @Service
 class InvoiceService(
@@ -20,7 +18,7 @@ class InvoiceService(
     private val tariffRepository: TariffRepository
 ) {
     fun generateInvoice(customer: Customer, periodStart: LocalDate, periodEnd: LocalDate): Invoice {
-        val latestMeter = customer.id.let { meterReadingRepository.findAll().firstOrNull { it.meter.customer.id == it } }
+        val latestMeter = customer.id.let { meterReadingRepository.findAll().firstOrNull { it.meter.customer == it } }
             ?: throw IllegalStateException("No meter reading found for this customer")
 
         val readings = meterReadingRepository.findAllByMeterAndReadingDateBetween(latestMeter.meter, periodStart, periodEnd)

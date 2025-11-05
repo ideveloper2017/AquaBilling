@@ -82,8 +82,8 @@ class CustomerServiceImpl(
     override fun getById(id: Long): Customer =
         customerRepository.findById(id).orElseThrow { NoSuchElementException("Customer not found") }
 
-    override fun findByAccountNumber(accountNumber: String): Customer? =
-        customerRepository.findByAccountNumber(accountNumber)
+//    override fun findByAccountNumber(accountNumber: String): Customer? =
+//        customerRepository.findByAccountNumber(accountNumber)
 
     override fun getByZone(zone: Zone): List<Customer> =
         customerRepository.findAllByZone(zone)

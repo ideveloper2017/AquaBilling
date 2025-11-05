@@ -1,6 +1,7 @@
 package uz.aquabill.app.v1.tarrif.model
 
 import jakarta.persistence.*
+import uz.aquabill.app.v1.tariffslab.model.TariffSlab
 import java.time.Instant
 import java.time.LocalDate
 

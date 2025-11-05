@@ -16,6 +16,9 @@ class Customer : BaseEntity() {
     var last_name: String? = null
 
     @Column(nullable = false)
+    var sur_name: String? = null
+
+    @Column(nullable = false)
     var phone: String? = null
 
     @Column(nullable = false)
@@ -27,6 +30,6 @@ class Customer : BaseEntity() {
 
     // Helper function to get full name
     fun getFullName(): String {
-        return listOfNotNull(first_name, last_name).joinToString(" ")
+        return listOfNotNull(first_name, last_name,sur_name).joinToString(" ")
     }
 }

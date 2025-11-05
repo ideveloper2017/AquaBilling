@@ -14,7 +14,7 @@ interface CustomerService {
     fun getAll(): List<Customer>
     fun getById(id: Long): Customer
 
-    fun findByAccountNumber(accountNumber: String): Customer?
+   // fun findByAccountNumber(accountNumber: String): Customer?
     fun getByZone(zone: Zone): List<Customer>
     fun save(customer: Customer): Customer
     fun delete(id: Long)

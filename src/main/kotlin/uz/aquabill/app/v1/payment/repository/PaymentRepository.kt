@@ -15,8 +15,8 @@ import java.time.LocalDateTime
 @Repository
 interface PaymentRepository : JpaRepository<Payment, Long> {
     fun findAllByInvoice(invoice: Invoice): List<Payment>
-
-    fun findByIdAndIsDeletedFalse(id: Long): Payment?
+    fun findAllByInvoiceId(invoiceId: Long): List<Payment>
+    fun findByIdAndDeletedFalse(id: Long): Payment?
     
     @Query("""
         SELECT p FROM Payment p 
@@ -24,7 +24,7 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
         AND (:status IS NULL OR p.status = :status)
         AND (:startDate IS NULL OR p.createdAt >= :startDate)
         AND (:endDate IS NULL OR p.createdAt <= :endDate)
-        AND p.isDeleted = false
+        AND p.deleted = false
     """)
     fun searchPayments(
         @Param("orderId") orderId: Long?,
@@ -34,11 +34,11 @@ interface PaymentRepository : JpaRepository<Payment, Long> {
         pageable: Pageable
     ): Page<Payment>
     
-    fun findByStatusAndIsDeletedFalse(status: PaymentStatus): List<Payment>
-    
-    fun findByCreatedByAndIsDeletedFalse(createdBy: User): List<Payment>
-    
-    fun findByCreatedAtBetweenAndIsDeletedFalse(startDate: LocalDateTime, endDate: LocalDateTime): List<Payment>
-    
-    fun existsByTransactionIdAndIsDeletedFalse(transactionId: String): Boolean
+//    fun findByStatusAndIsDeletedFalse(status: PaymentStatus): List<Payment>
+//
+//    fun findByCreatedByAndIsDeletedFalse(createdBy: User): List<Payment>
+//
+//    fun findByCreatedAtBetweenAndIsDeletedFalse(startDate: LocalDateTime, endDate: LocalDateTime): List<Payment>
+//
+//    fun existsByTransactionIdAndIsDeletedFalse(transactionId: String): Boolean
 }

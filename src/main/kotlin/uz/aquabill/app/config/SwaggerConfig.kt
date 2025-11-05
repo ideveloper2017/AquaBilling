@@ -31,13 +31,7 @@ class SwaggerConfig {
                 .version("1.0")
                 .description("REST API documentation for Off POS - Retail POS and Stock Management System")
         )
-        .addTagsItem(Tag().name("Units").description("Unit management API"))
-        .addTagsItem(Tag().name("Orders").description("Unit management API"))
-        .addTagsItem(Tag().name("Products").description("Operations related to products"))
-        .addTagsItem(Tag().name("Product Categories").description("Operations related to product categories"))
         .addTagsItem(Tag().name("Users").description("User management operations"))
-        .addServersItem(Server().url("/")
-            .description("Default Server URL"))
         .components(
             Components()
                 .addSecuritySchemes(

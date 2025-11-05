@@ -18,7 +18,7 @@ interface CustomerRepository : JpaRepository<Customer, Long> {
              OR c.phone LIKE CONCAT('%', :query, '%'))
     """)
     fun search(query: String): List<Customer>
-    fun findByAccountNumber(accountNumber: String): Customer?
+ //   fun findByAccountNumber(accountNumber: String): Customer?
     fun findAllByZone(zone: Zone): List<Customer>
 }
 
