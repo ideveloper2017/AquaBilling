@@ -6,6 +6,7 @@ import uz.aquabill.app.v1.customer.model.Customer
 data class CustomerDto(
     val id: Long?,
     val firstName: String?,
+    val surName: String?,
     val lastName: String?,
     val phone: String?,
     val address: String?
@@ -15,6 +16,7 @@ data class CustomerDto(
         return CustomerDto(
             id = customer.id,
             firstName = customer.first_name,
+            surName = customer.sur_name,
             lastName = customer.last_name,
             phone = customer.phone,
             address = customer.address

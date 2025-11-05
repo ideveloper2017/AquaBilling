@@ -10,6 +10,7 @@ class CustomerMapper {
     fun toDto(entity: Customer) = CustomerDto(
         id = entity.id,
         firstName = entity.first_name ?: "",
+        surName = entity.sur_name ?: "",
         lastName = entity.last_name ?: "",
         phone = entity.phone ?: "",
         address = entity.address ?: ""
@@ -18,6 +19,7 @@ class CustomerMapper {
     fun fromDto(dto: CustomerDto): Customer {
         val customer = Customer()
         customer.first_name = dto.firstName
+        customer.sur_name = dto.surName
         customer.last_name = dto.lastName
         customer.phone = dto.phone
         customer.address = dto.address
