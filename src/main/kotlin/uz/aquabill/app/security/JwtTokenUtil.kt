@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
 import java.security.Key
 import java.util.*
+import java.time.Duration
 
 private val logger = KotlinLogging.logger {}
 
@@ -19,7 +20,9 @@ class JwtTokenUtil(
     @Value("\${app.jwt.expiration}")
     private val accessTokenExpirationInMs: Long,
     @Value("\${app.jwt.refresh-expiration:2592000000}") // 30 days default
-    private val refreshTokenExpirationInMs: Long
+    private val refreshTokenExpirationInMs: Long,
+    @Value("\${app.jwt.clock-skew:30000}") // 30 seconds default clock skew
+    private val clockSkewMs: Long = 30000
 ) {
     private val key: Key = Keys.hmacShaKeyFor(secret.toByteArray())
     
@@ -83,12 +86,7 @@ class JwtTokenUtil(
     
     fun getUserIdFromToken(token: String): Long? {
         return try {
-            val claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .body
-            
+            val claims = getClaimsFromToken(token)
             @Suppress("UNCHECKED_CAST")
             (claims["id"] as? Number)?.toLong()
         } catch (e: Exception) {
@@ -96,6 +94,46 @@ class JwtTokenUtil(
             null
         }
     }
+    
+    private fun getClaimsFromToken(token: String): Claims {
+        return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .setAllowedClockSkewSeconds(clockSkewMs / 1000) // Convert to seconds
+            .build()
+            .parseClaimsJws(token)
+            .body
+    }
+    
+//    fun validateToken(token: String, userDetails: UserDetails): Boolean {
+//        return try {
+//            val claims = getClaimsFromToken(token)
+//            val username = claims.subject
+//            val expiration = claims.expiration
+//            val now = Date()
+//
+//            if (expiration.before(now)) {
+//                logger.warn { "Token expired at $expiration, current time: $now" }
+//                return false
+//            }
+//
+//            username == userDetails.username
+//        } catch (e: ExpiredJwtException) {
+//            logger.warn { "JWT token expired: ${e.message}" }
+//            false
+//        } catch (e: UnsupportedJwtException) {
+//            logger.warn { "Unsupported JWT token: ${e.message}" }
+//            false
+//        } catch (e: MalformedJwtException) {
+//            logger.warn { "Invalid JWT token: ${e.message}" }
+//            false
+//        } catch (e: SignatureException) {
+//            logger.warn { "Invalid JWT signature: ${e.message}" }
+//            false
+//        } catch (e: IllegalArgumentException) {
+//            logger.warn { "JWT claims string is empty: ${e.message}" }
+//            false
+//        }
+//    }
     
     fun validateToken(token: String, userDetails: UserDetails): Boolean {
         val username = getUsernameFromToken(token) ?: return false

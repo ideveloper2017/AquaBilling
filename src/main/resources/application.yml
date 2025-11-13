@@ -79,6 +79,7 @@ app:
     secret: 3zTvzr3p67VC61kmV54rIYu1545x4r4B70aRw4p3r6a8THa2yn2g4ZgPLv04y3fI
     expiration: 86400000 # 24 hours in milliseconds
     refresh-expiration: 2592000000 # 30 days in milliseconds
+    clock-skew: 30000 # 30 seconds in milliseconds
     header: Authorization
     token-prefix: "Bearer "
     token-type: Bearer

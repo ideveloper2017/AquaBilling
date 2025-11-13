@@ -22,7 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource
 class SecurityConfig(
     private val userDetailsService: CustomUserDetailsService,
     private val unauthorizedHandler: JwtAuthenticationEntryPoint,
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+   // private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val corsConfigurationSource: CorsConfigurationSource
 ) {
     @Bean
@@ -72,7 +72,7 @@ class SecurityConfig(
                     .requestMatchers("/api/roles/**", "/api/permissions/**").hasAuthority("USER_MANAGE")
                     .anyRequest().authenticated()
             }
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+      //  http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
 }

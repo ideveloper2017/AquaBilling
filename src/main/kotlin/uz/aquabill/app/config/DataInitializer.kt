@@ -183,18 +183,21 @@ class DataInitializer(
             val sampleCustomers = listOf(
                 Customer().apply {
                     first_name = "John"
+                    sur_name = "Doe"
                     last_name = "Doe"
                     phone = "+998901112233"
                     address = "123 Main St, Tashkent"
                 },
                 Customer().apply {
                     first_name = "Jane"
+                    sur_name = "Jane"
                     last_name = "Smith"
                     phone = "+998902223344"
                     address = "456 Oak St, Samarkand"
                 },
                 Customer().apply {
                     first_name = "Bob"
+                    sur_name = "Bob"
                     last_name = "Johnson"
                     phone = "+998903334455"
                     address = "789 Pine St, Bukhara"
