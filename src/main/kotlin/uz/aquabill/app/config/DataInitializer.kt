@@ -1,214 +1,284 @@
 package uz.aquabill.app.config
 
-import uz.aquabill.app.v1.user.model.Permission
-import uz.aquabill.app.v1.user.repository.PermissionRepository
-import uz.aquabill.app.v1.user.model.Role
-import uz.aquabill.app.v1.user.repository.RoleRepository
-import uz.aquabill.app.v1.user.model.User
-import uz.aquabill.app.v1.user.repository.UserRepository
+import jakarta.annotation.PostConstruct
+import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.boot.CommandLineRunner
-import uz.aquabill.app.v1.settings.model.Settings
-import uz.aquabill.app.v1.settings.repository.SettingsRepository
-import uz.aquabill.app.v1.customer.model.Customer
-import uz.aquabill.app.v1.customer.repository.CustomerRepository
+import org.springframework.transaction.annotation.Transactional
+import uz.aquabill.app.modules.v1.tenant.domain.Tenant
+import uz.aquabill.app.modules.v1.tenant.repository.TenantRepository
+import uz.aquabill.app.modules.v1.users.domain.Permission
+import uz.aquabill.app.modules.v1.users.domain.Role
+import uz.aquabill.app.modules.v1.users.domain.User
+import uz.aquabill.app.modules.v1.users.repository.PermissionRepository
+import uz.aquabill.app.modules.v1.users.repository.RoleRepository
+import uz.aquabill.app.modules.v1.users.repository.UserRepository
 
+
+import java.time.LocalDateTime
 
 @Configuration
+@EnableJpaAuditing
 class DataInitializer(
-    private val userRepository: UserRepository,
     private val roleRepository: RoleRepository,
     private val permissionRepository: PermissionRepository,
+    private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val settingsRepository: SettingsRepository,
-    private val customerRepository: CustomerRepository,
+    private val tenantRepository: TenantRepository,
+
 ) {
+    
+    private lateinit var defaultTenant: Tenant
+    
+    @PostConstruct
+    fun init() {
+        // Create or get default tenant
+        defaultTenant = tenantRepository.findByName("default")
+            .orElseGet {
+                tenantRepository.save(Tenant(name = "default", domain = "default.local"))
+            }
+
+    }
 
     @Bean
-    @Profile("!test")
     fun initData(): CommandLineRunner {
         return CommandLineRunner {
-//            val defaultUnits = listOf(
-//                Units().apply {
-//                    code = "шт."
-//                    name = "Dona"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "kg"
-//                    name = "Kilogramm"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "g"
-//                    name = "Gramm"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "l"
-//                    name = "Litr"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "m"
-//                    name = "Metr"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "m²"
-//                    name = "Kvadrat metr"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "m³"
-//                    name = "Kub metr"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "quti"
-//                    name = "Quti"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "set"
-//                    name = "To'plam"
-//                    active = true
-//                },
-//                Units().apply {
-//                    code = "pair"
-//                    name = "Juft"
-//                    active = true
-//                }
-//            )
-//            defaultUnits.forEach { unit ->
-//                if (!unitsRepository.existsByCode(unit.code!!)) {
-//                    unitsRepository.save(unit)
-//                }
-//            }
+            initializeRoles()
+            initializePermissions()
+            assignPermissionsToRoles()
+            createDemoUsers()
+        }
+    }
 
-//            [{"id":"8d372046-7782-450d-bc7a-9e8031ef2c8a","label":"manager","value":"manager"},{"id":"4ee47946-9f6e-4f39-806b-3a9459bbd83d","label":"hostess","value":"hostess"},{"id":"c253171c-9311-4804-8117-cdc83df217c3","label":"casher","value":"casher"},{"id":"f66a180d-dd05-4fb8-9672-409a168cf4a4","label":"bookkeeper","value":"bookkeeper"},{"id":"a75d622d-58f2-4a40-bebd-fed761e81cc2","label":"waiter","value":"waiter"},{"id":"623ae99d-0cfe-4305-8cde-e452edd416aa","label":"barman","value":"barman"},{"id":"464bf248-b147-417b-8f7e-5eee0af6cffd","label":"cook","value":"cook"},{"id":"72c0227f-df0b-46a9-9c3c-2abb0fe51596","label":"runner","value":"runner"}]
-//            Менеджер
-//            Хостес
-//            Кассир
-//            Бухгалтер
-//            Официант
-//            Бармен
-//            Повар
-
-            val settingKeyValue= listOf(
-                "app.name" to "My Application",
-                "app.version" to "1.0.0",
-                "app.description" to "This is a sample application"
+    @Transactional
+     fun initializeRoles() {
+        val roles = listOf(
+            Role(
+                name = "ADMIN",
+                description = "Administrator with full access",
+                tenant = defaultTenant
+            ),
+            Role(
+                name = "MANAGER", 
+                description = "Manager with elevated access",
+                tenant = defaultTenant
+            ),
+            Role(
+                name = "USER", 
+                description = "Standard user access",
+                tenant = defaultTenant
             )
+        )
 
-            val keyValues = settingKeyValue.map { perm ->
-                settingsRepository.findByValue(value = perm.second) ?: settingsRepository.save(Settings(perm.first, perm.second))
-            }.toSet()
-
-            // 1. Default permissions
-            val perms = listOf("USER_VIEW", "USER_CREATE", "USER_EDIT", "USER_DELETE", "PRODUCT_VIEW", "ORDER_MANAGE")
-            val permissionEntities = perms.map { perm ->
-                permissionRepository.findByName(perm) ?: permissionRepository.save(Permission(perm))
-            }.toSet()
-
-            // 1. Roles and their permissions
-            val adminSuperRole = roleRepository.findByName("SUPERADMIN") ?: run {
-                val role = Role(name = "SUPERADMIN")
-                role.permissions = permissionEntities.toMutableSet()
+        roles.forEach { role ->
+            if (!roleRepository.existsByNameAndTenantId(role.name, defaultTenant.id!!)) {
                 roleRepository.save(role)
+                println("✅ Created role: ${role.name} for tenant ${defaultTenant.name}")
+            } else {
+                println("ℹ️  Role ${role.name} already exists for tenant ${defaultTenant.name}")
             }
+        }
+    }
 
-            // 2. Roles and their permissions
-            val adminRole = roleRepository.findByName("ADMIN") ?: run {
-                val role = Role(name = "ADMIN")
-                role.permissions = permissionEntities.toMutableSet()
-                roleRepository.save(role)
-            }
-            val userRole = roleRepository.findByName("USER") ?: run {
-                val role = Role(name = "USER")
-                // Faqat ko‘rish permissionlarini oddiy userga beramiz
-                role.permissions = permissionEntities.filter { it.name.endsWith("_VIEW") }.toMutableSet()
-                roleRepository.save(role)
-            }
+    private fun initializePermissions() {
+        val permissions = listOf(
+            // User permissions
+            Permission(name = "USER_READ", description = "Read user information", resource = "USER", action = "READ"),
+            Permission(name = "USER_CREATE", description = "Create new users", resource = "USER", action = "CREATE"),
+            Permission(name = "USER_UPDATE", description = "Update user information", resource = "USER", action = "UPDATE"),
+            Permission(name = "USER_DELETE", description = "Delete users", resource = "USER", action = "DELETE"),
+            Permission(name = "USER_CHANGE_PASSWORD", description = "Change user password", resource = "USER", action = "CHANGE_PASSWORD"),
+            Permission(name = "USER_TOGGLE_STATUS", description = "Enable/disable users", resource = "USER", action = "TOGGLE_STATUS"),
 
-            // 1. Super Admin user
-            if (!userRepository.existsByUsername("Superadmin")) {
-                val superadmin = User().apply {
-                    username = "Superadmin"
-                    email = "superadmin@example.com"
-                    phone= "+998921234567"
-                    password = passwordEncoder.encode("superadmin123")
-                    firstName = "Superadmin"
-                    lastName = "Superadmin"
-                    active = true
-                    roles = mutableSetOf(adminSuperRole)
-                }
-                userRepository.save(superadmin)
-            }
+            // Role permissions
+            Permission(name = "ROLE_READ", description = "Read role information", resource = "ROLE", action = "READ"),
+            Permission(name = "ROLE_CREATE", description = "Create new roles", resource = "ROLE", action = "CREATE"),
+            Permission(name = "ROLE_UPDATE", description = "Update role information", resource = "ROLE", action = "UPDATE"),
+            Permission(name = "ROLE_DELETE", description = "Delete roles", resource = "ROLE", action = "DELETE"),
+            Permission(name = "ROLE_ASSIGN", description = "Assign roles to users", resource = "ROLE", action = "ASSIGN"),
+            Permission(name = "ROLE_REVOKE", description = "Revoke roles from users", resource = "ROLE", action = "REVOKE"),
 
-            // 2. Admin user
-            if (!userRepository.existsByUsername("admin")) {
-                val admin = User().apply {
-                    username = "admin"
-                    email = "admin@example.com"
-                    phone= "+998901234567"
-                    password = passwordEncoder.encode("admin123")
-                    firstName = "Admin"
-                    lastName = "User"
-                    active = true
-                    roles = mutableSetOf(adminRole)
-                }
-                userRepository.save(admin)
-            }
+            // Profile permissions
+            Permission(name = "PROFILE_READ", description = "View own profile", resource = "PROFILE", action = "READ"),
+            Permission(name = "PROFILE_UPDATE", description = "Update own profile", resource = "PROFILE", action = "UPDATE"),
+            Permission(name = "PROFILE_CHANGE_PASSWORD", description = "Change own password", resource = "PROFILE", action = "CHANGE_PASSWORD"),
 
-            // 3. Test user
-            if (!userRepository.existsByUsername("user")) {
-                val user = User().apply {
-                    username = "user"
-                    email = "user@example.com"
-                    phone= "+998911234567"
-                    password = passwordEncoder.encode("user123")
-                    firstName = "Test"
-                    lastName = "User"
-                    active = true
-                    roles = mutableSetOf(userRole)
-                }
-                userRepository.save(user)
-            }
+            // Audit log permissions
+            Permission(name = "AUDIT_READ", description = "View audit logs", resource = "AUDIT", action = "READ"),
+            Permission(name = "AUDIT_EXPORT", description = "Export audit logs", resource = "AUDIT", action = "EXPORT"),
 
-            // Initialize sample customers
-            val sampleCustomers = listOf(
-                Customer().apply {
-                    first_name = "John"
-                    sur_name = "Doe"
-                    last_name = "Doe"
-                    phone = "+998901112233"
-                    address = "123 Main St, Tashkent"
-                },
-                Customer().apply {
-                    first_name = "Jane"
-                    sur_name = "Jane"
-                    last_name = "Smith"
-                    phone = "+998902223344"
-                    address = "456 Oak St, Samarkand"
-                },
-                Customer().apply {
-                    first_name = "Bob"
-                    sur_name = "Bob"
-                    last_name = "Johnson"
-                    phone = "+998903334455"
-                    address = "789 Pine St, Bukhara"
-                }
+            // System settings permissions
+            Permission(name = "SETTINGS_READ", description = "View system settings", resource = "SETTINGS", action = "READ"),
+            Permission(name = "SETTINGS_UPDATE", description = "Update system settings", resource = "SETTINGS", action = "UPDATE"),
+
+            // Dashboard permissions
+            Permission(name = "DASHBOARD_VIEW", description = "View dashboard", resource = "DASHBOARD", action = "VIEW"),
+            Permission(name = "DASHBOARD_EXPORT", description = "Export dashboard data", resource = "DASHBOARD", action = "EXPORT")
+        )
+
+        permissions.forEach { permission ->
+            if (!permissionRepository.existsByName(permission.name)) {
+                permissionRepository.save(permission)
+                println("✅ Created permission: ${permission.name} (${permission.resource}:${permission.action})")
+            }
+        }
+    }
+
+    @Transactional
+    fun assignPermissionsToRoles() {
+        // Get all permissions
+        val allPermissions = permissionRepository.findAll()
+
+        // Admin gets all permissions
+        val adminRole = roleRepository.findByName("ADMIN").orElseThrow {
+            IllegalStateException("ADMIN role not found")
+        }
+        adminRole.permissions = allPermissions.toMutableSet()
+        roleRepository.save(adminRole)
+        println("✅ Assigned all ${allPermissions.size} permissions to ADMIN role")
+
+        // Manager gets most permissions except sensitive ones
+        val managerRole = roleRepository.findByName("MANAGER").orElseThrow {
+            IllegalStateException("MANAGER role not found")
+        }
+        val managerPermissions = allPermissions.filter { permission ->
+            !permission.name.endsWith("_DELETE") &&
+                    !permission.name.endsWith("TOGGLE_STATUS") &&
+                    !permission.name.startsWith("ROLE_") &&
+                    !permission.name.startsWith("SETTINGS_")
+        }.toMutableSet()
+        managerRole.permissions = managerPermissions
+        roleRepository.save(managerRole)
+        println("✅ Assigned ${managerPermissions.size} permissions to MANAGER role")
+
+        // Regular user gets basic read permissions
+        val userRole = roleRepository.findByName("USER").orElseThrow {
+            IllegalStateException("USER role not found")
+        }
+        val userPermissions = allPermissions.filter { permission ->
+            permission.name in listOf(
+                "PROFILE_READ",
+                "PROFILE_UPDATE",
+                "PROFILE_CHANGE_PASSWORD",
+                "DASHBOARD_VIEW"
             )
+        }.toMutableSet()
+        roleRepository.save(userRole)
+        println("✅ Assigned ${userPermissions.size} permissions to USER role")
+    }
 
-            sampleCustomers.forEach { customer ->
-                if (!customerRepository.existsByPhoneAndDeleted(customer.phone!!, false)) {
-                    customerRepository.save(customer)
-                }
+    @Transactional
+     fun createDemoUsers() {
+        val adminRole = roleRepository.findByNameAndTenantId("ADMIN", defaultTenant.id!!)
+            ?: throw IllegalStateException("ADMIN role not found for tenant ${defaultTenant.name}")
+        val managerRole = roleRepository.findByNameAndTenantId("MANAGER", defaultTenant.id!!)
+            ?: throw IllegalStateException("MANAGER role not found for tenant ${defaultTenant.name}")
+        val userRole = roleRepository.findByNameAndTenantId("USER", defaultTenant.id!!)
+            ?: throw IllegalStateException("USER role not found for tenant ${defaultTenant.name}")
+
+        createAdminUser(adminRole)
+        createManagerUser(managerRole)
+        createRegularUser(userRole)
+    }
+
+    private fun createAdminUser(role: Role) {
+        val username = "admin"
+        if (!userRepository.existsByLoginAndTenant(username, defaultTenant)) {
+            val admin = User().apply {
+                login = username
+                phone="+998900000001"
+                email = "admin@example.com"
+                passwords = passwordEncoder.encode("admin123")
+                firstName = "System"
+                lastName = "Administrator"
+                enabled = true
+                accountNonExpired = true
+                accountNonLocked = true
+                credentialsNonExpired = true
+                tenant = defaultTenant
             }
+            admin.roles = mutableSetOf(role)
+
+            // Add direct permissions to admin
+            val allPermissions = permissionRepository.findAll().toMutableSet()
+            admin.permissions = allPermissions
+
+            userRepository.save(admin)
+            println("✅ Created admin user: admin / admin123")
+        }
+    }
+
+    private fun createManagerUser(role: Role) {
+        val username = "manager"
+        if (!userRepository.existsByLoginAndTenant(username, defaultTenant)) {
+            val manager = User().apply {
+                login = username
+                phone="+998900000000"
+                email = "manager@example.com"
+                passwords = passwordEncoder.encode("manager123")
+                firstName = "Project"
+                lastName = "Manager"
+                enabled = true
+                accountNonExpired = true
+                accountNonLocked = true
+                credentialsNonExpired = true
+                tenant = defaultTenant
+            }
+            manager.roles = mutableSetOf(role)
+
+            // Add direct permissions to manager
+            val managerPermissions = mutableSetOf<Permission>(
+                permissionRepository.findByName("AUDIT_READ").orElseThrow(),
+                permissionRepository.findByName("DASHBOARD_EXPORT").orElseThrow()
+            )
+            manager.permissions = managerPermissions
+
+            userRepository.save(manager)
+            println("✅ Created manager user: manager / manager123")
+        }
+    }
+
+    private fun createRegularUser(role: Role) {
+        val username = "user"
+        if (!userRepository.existsByLoginAndTenant(username, defaultTenant)) {
+            val user = User().apply {
+                login = username
+                phone="+998900000002"
+                email = "user@example.com"
+                passwords = passwordEncoder.encode("user123")
+                firstName = "Regular"
+                lastName = "User"
+                enabled = true
+                accountNonExpired = true
+                accountNonLocked = true
+                credentialsNonExpired = true
+                tenant = defaultTenant
+            }
+            user.roles = mutableSetOf(role)
+
+            // Get required permissions
+            val profileReadPermission = permissionRepository.findByName("PROFILE_READ")
+                .orElseThrow { IllegalStateException("PROFILE_READ permission not found") }
+            val profileUpdatePermission = permissionRepository.findByName("PROFILE_UPDATE")
+                .orElseThrow { IllegalStateException("PROFILE_UPDATE permission not found") }
+            val changePasswordPermission = permissionRepository.findByName("PROFILE_CHANGE_PASSWORD")
+                .orElseThrow { IllegalStateException("PROFILE_CHANGE_PASSWORD permission not found") }
+            val dashboardViewPermission = permissionRepository.findByName("DASHBOARD_VIEW")
+                .orElseThrow { IllegalStateException("DASHBOARD_VIEW permission not found") }
+
+            // Add direct permissions to regular user
+            val userPermissions = mutableSetOf<Permission>(
+                profileReadPermission,
+                profileUpdatePermission,
+                changePasswordPermission,
+                dashboardViewPermission
+            )
+            user.permissions = userPermissions
+
+            userRepository.save(user)
+            println("✅ Created regular user: user / user123")
         }
     }
 }

@@ -5,7 +5,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import uz.aquabill.app.security.CurrentUserArgumentResolver
+import uz.aquabill.app.app.security.CurrentUserArgumentResolver
+
 
 @Configuration
 class WebMvcConfig : WebMvcConfigurer {

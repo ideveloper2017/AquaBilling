@@ -1,7 +1,7 @@
 package uz.aquabill.app.common
 
 import io.swagger.v3.oas.annotations.media.Schema
-import uz.aquabill.app.v1.payment.dto.PaymentDto
+
 
 @Schema(description = "Standard API response wrapper for all endpoints")
 data class ApiResponse<T>(

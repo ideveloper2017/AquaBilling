@@ -1,0 +1,11 @@
+package uz.aquabill.app.modules.v1.zone.repository
+
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
+import uz.aquabill.app.modules.v1.zone.model.Zone
+
+
+@Repository
+interface ZoneRepository : JpaRepository<Zone, Long> {
+    fun findByName(name: String): Zone?
+}

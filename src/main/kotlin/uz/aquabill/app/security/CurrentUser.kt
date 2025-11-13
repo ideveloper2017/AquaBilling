@@ -1,6 +1,6 @@
-package uz.aquabill.app.security
+package uz.aquabill.app.app.security
 
-import uz.aquabill.app.v1.user.model.User
+
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -10,6 +10,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
+import uz.aquabill.app.modules.v1.users.domain.User
+import uz.aquabill.app.security.UserDetailsImpl
 import java.lang.annotation.Documented
 
 @Target(AnnotationTarget.VALUE_PARAMETER)
@@ -20,7 +22,7 @@ annotation class CurrentUser
 
 class CurrentUserArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
-        return parameter.parameterType == User::class.java && 
+        return parameter.parameterType == User::class.java &&
                parameter.hasParameterAnnotation(CurrentUser::class.java)
     }
 
