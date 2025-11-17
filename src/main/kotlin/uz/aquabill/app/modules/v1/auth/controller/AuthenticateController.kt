@@ -162,7 +162,12 @@ class AuthenticationController(
         ApiResponse(responseCode = "401", description = "User not authenticated", content = [Content(schema = Schema(implementation = MessageResponse::class))])
     )
     @GetMapping("/me")
-    fun getCurrentUser(@CurrentUser user: User): ResponseEntity<UserInfo> {
+    fun getCurrentUser(): ResponseEntity<UserInfo> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        val userDetails = authentication.principal as UserDetails
+        val user = userRepository.findByLogin(userDetails.username)
+            .orElseThrow { RuntimeException("User not found") }
+
         return ResponseEntity.ok(
             UserInfo(
                 id = user.id,
@@ -175,6 +180,7 @@ class AuthenticationController(
             )
         )
     }
+
 }
 
 
