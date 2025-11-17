@@ -24,8 +24,8 @@ class Customer : BaseEntity() {
     @Column(nullable = false)
     var address: String? = null
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "zone_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.MERGE, CascadeType.REFRESH])
+    @JoinColumn(name = "zone_id", referencedColumnName = "id")
     var zone: Zone? = null
 
 
