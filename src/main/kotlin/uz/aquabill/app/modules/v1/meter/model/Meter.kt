@@ -30,5 +30,7 @@ data class Meter(
     val createdAt: Instant = Instant.now()
 )
 
+
+
 enum class MeterType { ANALOG, DIGITAL }
 enum class MeterStatus { ACTIVE, INACTIVE, REPLACED }

@@ -12,4 +12,5 @@ import java.time.LocalDate
 interface MeterReadingRepository : JpaRepository<MeterReading, Long> {
     fun findTopByMeterOrderByReadingDateDesc(meter: Meter): MeterReading?
     fun findAllByMeterAndReadingDateBetween(meter: Meter, start: LocalDate, end: LocalDate): List<MeterReading>
+    fun findByMeterOrderByReadingDateDesc(meter: Meter): List<MeterReading>
 }
