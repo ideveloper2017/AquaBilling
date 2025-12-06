@@ -12,7 +12,7 @@ import java.time.LocalDate
 interface MeterRepository : JpaRepository<Meter, Long> {
     fun findBySerialNumber(serialNumber: String): Meter?
     fun findAllByCustomer(customer: Customer): List<Meter>
-    fun findTopByMeterOrderByReadingDateDesc(meter: Meter): MeterReading?
-    fun findAllByMeterAndReadingDateBetween(meter: Meter, start: LocalDate, end: LocalDate): List<MeterReading>
-    fun findByMeterOrderByReadingDateDesc(meter: Meter): List<MeterReading>
+//    fun findTopByMeterOrderByReadingDateDesc(meter: Meter): MeterReading?
+//    fun findAllByMeterAndReadingDateBetween(meter: Meter, start: LocalDate, end: LocalDate): List<MeterReading>
+//    fun findByMeterOrderByReadingDateDesc(meter: Meter): List<MeterReading>
 }

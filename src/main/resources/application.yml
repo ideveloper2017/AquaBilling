@@ -52,17 +52,17 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
-    operations-sorter: method
-    tags-sorter: alpha
-    doc-expansion: none
-    display-request-duration: true
-    default-model-expand-depth: 3
-    default-model-rendering: model
-    display-operation-id: true
-    persist-authorization: true
-    filter: true
-    try-it-out-enabled: true
-    with-credentials: true
+#    operations-sorter: method
+#    tags-sorter: alpha
+#    doc-expansion: none
+#    display-request-duration: true
+#    default-model-expand-depth: 3
+#    default-model-rendering: model
+#    display-operation-id: true
+#    persist-authorization: true
+#    filter: true
+#    try-it-out-enabled: true
+#    with-credentials: true
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
   model-and-view-allowed: false

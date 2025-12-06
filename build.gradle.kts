@@ -43,6 +43,12 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.3")
     implementation("org.springframework.boot:spring-boot-configuration-processor")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.session:spring-session-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-data-rest")
+    implementation("org.springframework.boot:spring-boot-starter-batch")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    testImplementation("org.springframework.batch:spring-batch-test")
+    testImplementation("io.projectreactor:reactor-test")
     "developmentOnly"("org.springframework.boot:spring-boot-devtools")
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
@@ -54,6 +60,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("io.r2dbc:r2dbc-h2")
+    runtimeOnly("org.postgresql:r2dbc-postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
